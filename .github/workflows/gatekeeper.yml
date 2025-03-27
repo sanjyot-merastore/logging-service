@@ -1,0 +1,74 @@
+name: Watcher
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  check-jira-and-change-type:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log PR title before checks
+        run: |
+          PR_TITLE=$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")
+          echo "ℹ️ PR Title BEFORE validation: '$PR_TITLE'"
+
+      - name: Check PR title for JIRA ticket and change type
+        id: check_title
+        run: |
+          PR_TITLE=$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")
+          echo "ℹ️ Evaluating PR Title: '$PR_TITLE'"
+
+          JIRA_REGEX="^[A-Z]+-[0-9]+:"
+          CHANGE_TYPE_REGEX="^[A-Z]+-[0-9]+: ?(\(?(feat|fix|hotfix|chore|docs|refactor|test|ci|perf|infra|style|revert|build)\)?) "
+
+          echo "🔍 Checking for valid change type..."
+          if [[ ! "$PR_TITLE" =~ $CHANGE_TYPE_REGEX ]]; then
+            echo "::error::❌ Invalid PR title format. It must start with a valid change type followed by an optional scope."
+            echo "::error::✅ Allowed change types: feat, fix, hotfix, chore, docs, refactor, test, ci, perf, infra, style, revert, build"
+            echo "::error::🔹 Example: 'MERA-9: feat Created feature' or 'MERA-9: (fix) Bug fix'"
+            exit 1
+          else
+            DETECTED_CHANGE_TYPE=$(echo "$PR_TITLE" | grep -oP '(\(?(feat|fix|hotfix|chore|docs|refactor|test|ci|perf|infra|style|revert|build)\)?)')
+            echo "✅ Change type detected: '$DETECTED_CHANGE_TYPE'"
+          fi
+
+          echo "🔍 Checking for JIRA ticket..."
+          if [[ ! "$PR_TITLE" =~ $JIRA_REGEX ]]; then
+            echo "::error::❌ No JIRA ticket found in PR title. Expected format: 'MERA-9: feat Created feature'"
+            exit 1
+          else
+            DETECTED_JIRA_TICKET=$(echo "$PR_TITLE" | grep -oP '^[A-Z]+-[0-9]+')
+            echo "✅ JIRA ticket detected: '$DETECTED_JIRA_TICKET'"
+          fi
+
+          echo "✅ PR title validation PASSED."
+
+      - name: Post comment if checks fail
+        if: failure()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if command -v gh &> /dev/null; then
+            PR_NUMBER=${{ github.event.pull_request.number }}
+            REPO=${{ github.repository }}
+            gh pr comment "$PR_NUMBER" --repo "$REPO" --body "🚨 **Your PR title must follow the correct format!**  
+
+            **✅ Allowed PR title formats:**  
+            - \`MERA-9: feat Created MeraStore.Shared.Kernel.Common.Core\`  
+            - \`MERA-9: (feat) Created MeraStore.Shared.Kernel.Common.Core\`  
+
+            **✅ Allowed change types:**  
+            \`feat\`, \`fix\`, \`hotfix\`, \`chore\`, \`docs\`, \`refactor\`, \`test\`, \`ci\`, \`perf\`, \`infra\`, \`style\`, \`revert\`, \`build\`  
+
+            **🔹 Correct Examples:**  
+            - \`MERA-9: feat Added new feature\`  
+            - \`PROJ-123: (fix) Resolved database issue\`  
+
+            Please update your PR title accordingly. 🛠"
+          else
+            echo "⚠️ GitHub CLI (gh) not available. Cannot post comment."
