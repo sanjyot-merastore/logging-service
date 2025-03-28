@@ -2,7 +2,7 @@
 
 namespace MeraStore.Services.Logging.Domain.Interfaces;
 
-public interface IFieldService
+public interface ILogFieldsProvider
 {
   Task<LogFields> GetFieldsAsync();
 }
