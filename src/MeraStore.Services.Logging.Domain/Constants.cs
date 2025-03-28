@@ -11,6 +11,7 @@ public static class Constants
       public const string Url = "ElasticSearchUrl";
       public const string DefaultIndexFormat = "log-service-";
       public const string InfraIndexFormat = "infra-logs-";
+      public const string EFCoreIndexFormat = "ef-logs-";
     }
 
     public static class RequestHeaders
