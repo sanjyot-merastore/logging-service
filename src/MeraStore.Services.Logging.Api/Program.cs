@@ -1,9 +1,12 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
+
+using MeraStore.Services.Logging.Api.Middlewares;
 using MeraStore.Services.Logging.Application.Services;
 using MeraStore.Services.Logging.Domain.Interfaces;
 using MeraStore.Services.Logging.Domain.LoggingSinks;
-using Serilog;
+
+using Serilog.Formatting.Compact;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,30 +14,41 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddFastEndpoints();
-builder.Services.SwaggerDocument();
+
+builder.Services.SwaggerDocument(x =>
+{
+  x.ShortSchemaNames = true;
+  x.NewtonsoftSettings = setting =>
+  {
+    setting.Formatting = Formatting.Indented;
+    setting.ContractResolver = new CamelCasePropertyNamesContractResolver();
+    setting.NullValueHandling = NullValueHandling.Ignore;
+    setting.Converters =
+    [
+      new StringEnumConverter()
+    ];
+  };
+});
 
 // Configure Serilog
-const string elasticsearchUrl = "http://localhost:9200";
+string elasticsearchUrl = builder.Configuration.GetValue<string>(Constants.Logging.Elasticsearch.Url)!;
 Log.Logger = new LoggerConfiguration()
   .Enrich.FromLogContext()
   .WriteTo.Console()
-  .WriteTo.Sink(new ElasticsearchLogSink(elasticsearchUrl))
+  .WriteTo.Sink(new ElasticsearchSerilogSink(elasticsearchUrl))
   .CreateLogger();
 
 builder.Host.UseSerilog();
 
-builder.Services.AddScoped<IFieldService, FieldService>();
+builder.Services.AddSingleton<ILogFieldsProvider, LogFieldsProvider>();
 
 
 var app = builder.Build();
 app.UseFastEndpoints();
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-  app.UseSwaggerGen();
-}
+app.UseSwaggerGen();
 
-app.UseSerilogRequestLogging();
+
+app.UseMiddleware<TracingMiddleware>();
 app.UseHttpsRedirection();
 
 app.Run();
