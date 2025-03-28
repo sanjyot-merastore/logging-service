@@ -29,9 +29,11 @@ builder.Services.SwaggerDocument(x =>
     ];
   };
 });
+builder.Services.AddHealthChecks()
+  .AddCheck<ServiceHealthCheck>("logging_service_health_check");
 
 // Configure Serilog
-string elasticsearchUrl = builder.Configuration.GetValue<string>(Constants.Logging.Elasticsearch.Url)!;
+var elasticsearchUrl = builder.Configuration.GetValue<string>(Constants.Logging.Elasticsearch.Url)!;
 Log.Logger = new LoggerConfiguration()
   .Enrich.FromLogContext()
   .WriteTo.Console()
@@ -42,13 +44,12 @@ builder.Host.UseSerilog();
 
 builder.Services.AddSingleton<ILogFieldsProvider, LogFieldsProvider>();
 
-
 var app = builder.Build();
 app.UseFastEndpoints();
 app.UseSwaggerGen();
 
-
 app.UseMiddleware<TracingMiddleware>();
 app.UseHttpsRedirection();
+app.MapHealthChecks("/health");
 
 app.Run();
