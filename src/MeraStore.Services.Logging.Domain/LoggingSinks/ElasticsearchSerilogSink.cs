@@ -33,7 +33,7 @@ public class ElasticsearchSerilogSink : ILogEventSink
 
   public void Emit(LogEvent logEvent)
   {
-    var sourceContext = logEvent.Properties.TryGetValue(Constants.Logging.LogFields.SourceContext, out var contextValue)
+    var sourceContext = logEvent.Properties.TryGetValue("SourceContext", out var contextValue)
       ? contextValue.ToString()?.Trim('"')
       : string.Empty;
 
@@ -45,7 +45,7 @@ public class ElasticsearchSerilogSink : ILogEventSink
     {
       [Constants.Logging.LogFields.Timestamp] = logEvent.Timestamp.UtcDateTime,
       [Constants.Logging.LogFields.Level] = logEvent.Level.ToString(),
-      [Constants.ServiceName] = Constants.ServiceName,
+      ["service-name"] = Constants.ServiceName,
       [Constants.Logging.LogFields.CorrelationId] = GetFormattedValue(logEvent.Properties, Constants.Logging.LogFields.CorrelationId),
       [Constants.Logging.LogFields.TransactionId] = GetFormattedValue(logEvent.Properties, Constants.Logging.LogFields.TransactionId),
       [Constants.Logging.LogFields.RequestId] = GetFormattedValue(logEvent.Properties, Constants.Logging.LogFields.RequestId),
