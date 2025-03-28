@@ -21,8 +21,7 @@ public class TracingMiddleware(RequestDelegate next)
     var userAgent = context.Request.Headers[Constants.Logging.RequestHeaders.UserAgent].FirstOrDefault() ?? "unknown";
 
     // Get full request URL (including scheme, host, and query params)
-    var requestUrl =
-      $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
+    var requestUrl = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
     var requestBaseUrl = $"{context.Request.Scheme}://{context.Request.Host}";
     var httpMethod = context.Request.Method;
     var httpVersion = context.Request.Protocol;

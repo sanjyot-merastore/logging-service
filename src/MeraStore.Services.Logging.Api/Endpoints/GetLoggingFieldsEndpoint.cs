@@ -26,8 +26,6 @@ namespace MeraStore.Services.Logging.Api.Endpoints
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-      logger.LogInformation("Test");
-      logger.LogError(new FormatException("Test"), "Sample Exception");
       await SendAsync(await logService.GetFieldsAsync(), cancellation: ct);
     }
   }
