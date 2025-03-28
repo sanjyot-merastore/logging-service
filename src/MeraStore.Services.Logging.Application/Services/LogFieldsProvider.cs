@@ -25,7 +25,7 @@ public class LogFieldsProvider : ILogFieldsProvider
   {
     try
     {
-      string filePath = Path.Combine(AppContext.BaseDirectory, "configs", "log-schema.json");
+      var filePath = Path.Combine(AppContext.BaseDirectory, "configs", "log-schema.json");
 
       if (!File.Exists(filePath))
       {
@@ -35,7 +35,7 @@ public class LogFieldsProvider : ILogFieldsProvider
 
       await using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
       using var reader = new StreamReader(stream);
-      string jsonContent = await reader.ReadToEndAsync();
+      var jsonContent = await reader.ReadToEndAsync();
 
       var logFields = JsonConvert.DeserializeObject<LogFields>(jsonContent);
       return logFields ?? new LogFields();
