@@ -24,16 +24,16 @@ jobs:
           echo "ℹ️ Evaluating PR Title: '$PR_TITLE'"
 
           JIRA_REGEX="^[A-Z]+-[0-9]+:"
-          CHANGE_TYPE_REGEX="^[A-Z]+-[0-9]+: ?(\(?(feat|fix|hotfix|chore|docs|refactor|test|ci|perf|infra|style|revert|build)\)?) "
+          CHANGE_TYPE_REGEX="^[A-Z]+-[0-9]+: ?(\(?(feat|fix|hotfix|chore|docs|bug|bugfix|bug-fix|refactor|test|ci|perf|infra|style|revert|build)\)?) "
 
           echo "🔍 Checking for valid change type..."
           if [[ ! "$PR_TITLE" =~ $CHANGE_TYPE_REGEX ]]; then
             echo "::error::❌ Invalid PR title format. It must start with a valid change type followed by an optional scope."
-            echo "::error::✅ Allowed change types: feat, fix, hotfix, chore, docs, refactor, test, ci, perf, infra, style, revert, build"
+            echo "::error::✅ Allowed change types: feat, fix,bug, bugfix,bug-fix, hotfix, chore, docs, refactor, test, ci, perf, infra, style, revert, build"
             echo "::error::🔹 Example: 'MERA-9: feat Created feature' or 'MERA-9: (fix) Bug fix'"
             exit 1
           else
-            DETECTED_CHANGE_TYPE=$(echo "$PR_TITLE" | grep -oP '(\(?(feat|fix|hotfix|chore|docs|refactor|test|ci|perf|infra|style|revert|build)\)?)')
+            DETECTED_CHANGE_TYPE=$(echo "$PR_TITLE" | grep -oP '(\(?(feat|fix|hotfix|chore|docs|refactor|bug|bugfix|bug-fix|test|ci|perf|infra|style|revert|build)\)?)')
             echo "✅ Change type detected: '$DETECTED_CHANGE_TYPE'"
           fi
 
