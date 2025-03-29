@@ -1,8 +1,8 @@
 ﻿using FastEndpoints;
-
+using MeraStore.Services.Logging.Domain.Attributes;
 using MeraStore.Services.Logging.Domain.Interfaces;
 using MeraStore.Services.Logging.Domain.Models;
-using Microsoft.AspNetCore.Mvc;
+using MeraStore.Shared.Kernel.Common.Exceptions.Exceptions;
 
 namespace MeraStore.Services.Logging.Api.Endpoints;
 

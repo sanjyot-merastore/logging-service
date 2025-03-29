@@ -1,11 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-
 using Elastic.Clients.Elasticsearch;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace MeraStore.Services.Logging.Domain.LoggingSinks;
+namespace MeraStore.Services.Logging.Domain.LogSinks;
 
 [SuppressMessage("ReSharper", "UseObjectOrCollectionInitializer")]
 public abstract class BaseElasticsearchSink : ILogEventSink
