@@ -4,6 +4,10 @@ using MeraStore.Services.Logging.Domain.Repositories;
 
 namespace MeraStore.Services.Logging.Api.Endpoints;
 
+/// <summary>
+/// Endpoint for retrieving an API response log by its unique identifier.
+/// </summary>
+/// <param name="logService">Service for accessing API response logs.</param>
 public class GetApiResponseLogEndpoint(IApiLogRepository logService) : EndpointWithoutRequest<ApiResponseLog>
 {
   public override void Configure()

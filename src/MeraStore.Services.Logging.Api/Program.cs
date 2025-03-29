@@ -52,6 +52,7 @@ using (var scope = app.Services.CreateScope())
 
 
 app.UseMiddleware<TracingMiddleware>();
+app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.MapHealthChecks("/health");
 

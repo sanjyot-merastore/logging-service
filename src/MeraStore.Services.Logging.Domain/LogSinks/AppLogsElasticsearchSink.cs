@@ -1,6 +1,6 @@
 ﻿using Serilog.Events;
 
-namespace MeraStore.Services.Logging.Domain.LoggingSinks;
+namespace MeraStore.Services.Logging.Domain.LogSinks;
 
 public class AppLogsElasticsearchSink(string elasticsearchUrl)
   : BaseElasticsearchSink(elasticsearchUrl, Constants.Logging.Elasticsearch.DefaultIndexFormat)
@@ -18,6 +18,10 @@ public class AppLogsElasticsearchSink(string elasticsearchUrl)
     logEntry[Constants.Logging.LogFields.ClientIp] = GetFormattedValue(logEvent.Properties, Constants.Logging.LogFields.ClientIp);
     logEntry[Constants.Logging.LogFields.UserAgent] = GetFormattedValue(logEvent.Properties, Constants.Logging.LogFields.UserAgent);
     logEntry[Constants.Logging.LogFields.RequestPath] = GetFormattedValue(logEvent.Properties, Constants.Logging.LogFields.RequestPath); // System & Host Metadata
+
+    var sourceContext = logEntry[Constants.Logging.LogFields.SourceContext]?.ToString();
+    if (sourceContext == null || !sourceContext.StartsWith("MeraStore"))
+      return; // Ignore logs that don't belong here
 
     Task.Run(async () => await Client.IndexAsync(logEntry, idx => idx.Index($"{Constants.Logging.Elasticsearch.DefaultIndexFormat}{DateTime.UtcNow:yyyy-MM}")));
   }

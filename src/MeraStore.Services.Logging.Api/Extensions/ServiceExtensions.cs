@@ -4,11 +4,10 @@ using MeraStore.Services.Logging.Application.Features.Requests.Create;
 using MeraStore.Services.Logging.Application.Features.Responses.Create;
 using MeraStore.Services.Logging.Application.Services;
 using MeraStore.Services.Logging.Domain.Interfaces;
-using MeraStore.Services.Logging.Domain.LoggingSinks;
+using MeraStore.Services.Logging.Domain.LogSinks;
 using MeraStore.Services.Logging.Domain.Repositories;
 using MeraStore.Services.Logging.Infrastructure.Repositories;
 
-using Constants = MeraStore.Services.Logging.Domain.Constants;
 
 namespace MeraStore.Services.Logging.Api.Extensions;
 
@@ -25,7 +24,7 @@ public static class ServiceExtensions
   public static void AddLoggingServices(this WebApplicationBuilder builder)
   {
     // Retrieve Elasticsearch URL from configuration
-    var elasticsearchUrl = builder.Configuration.GetValue<string>(Constants.Logging.Elasticsearch.Url);
+    var elasticsearchUrl = builder.Configuration.GetValue<string>(Domain.Constants.Logging.Elasticsearch.Url);
 
     if (string.IsNullOrWhiteSpace(elasticsearchUrl))
     {
