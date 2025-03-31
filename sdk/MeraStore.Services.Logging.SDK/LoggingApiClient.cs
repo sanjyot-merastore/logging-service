@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Json;
-
 using MeraStore.Services.Logging.SDK.Interfaces;
 using MeraStore.Services.Logging.SDK.Models;
 
@@ -9,13 +8,13 @@ internal record ResponseDto(string Id);
 
 public class LoggingApiClient(HttpClient httpClient) : ILoggingApiClient
 {
-  public async Task<ApiResponse<string>> CreateRequestLogAsync(BaseDto command)
+  public async Task<ApiResponse<RequestLog>> CreateRequestLogAsync(RequestLog command)
       => await PostLogAsync(ApiEndpoints.RequestLogs.Create, command);
 
   public async Task<ApiResponse<RequestLog>> GetRequestLogAsync(Ulid id)
       => await GetLogAsync<RequestLog>(ApiEndpoints.RequestLogs.Get, id);
 
-  public async Task<ApiResponse<string>> CreateResponseLogAsync(BaseDto command)
+  public async Task<ApiResponse<ResponseLog>> CreateResponseLogAsync(ResponseLog command)
       => await PostLogAsync(ApiEndpoints.ResponseLogs.Create, command);
 
   public async Task<ApiResponse<ResponseLog>> GetResponseLogAsync(Ulid id)
@@ -24,10 +23,11 @@ public class LoggingApiClient(HttpClient httpClient) : ILoggingApiClient
   public async Task<ApiResponse<LogFields>> GetLoggingFieldsAsync()
       => await GetLogAsync<LogFields>(ApiEndpoints.FieldLogs.GetAll);
 
-  private async Task<ApiResponse<string>> PostLogAsync(string endpoint, BaseDto command)
+  private async Task<ApiResponse<T>> PostLogAsync<T>(string endpoint, T command) where T: BaseDto
   {
     var response = await httpClient.PostAsJsonAsync(endpoint, command);
-    return await response.GetResponseOrFault<string>();
+   return await response.GetResponseOrFault<T>();
+   
   }
 
   private async Task<ApiResponse<T>> GetLogAsync<T>(string endpoint, Ulid? id = null)

@@ -20,7 +20,7 @@ var clientBuilder = serviceProvider.GetRequiredService<ClientBuilder>();
 
 // Configure the client
 var loggingClient = clientBuilder
-    .WithUrl("http://logging-api.merastore.com:8101") // Replace with actual service URL
+    .WithUrl("http://logging-api.merastore.com:8101/") // Replace with actual service URL
     .UseDefaultResiliencePolicy()
     .Build();
 
@@ -69,24 +69,25 @@ static async Task CreateRequestLog(LoggingApiClient loggingClient)
     CorrelationId = Guid.NewGuid().ToString(),
     Payload = "Hello, World!"u8.ToArray(),
     Timestamp = DateTime.UtcNow,
-    HttpMethod = "POST",
+    HttpMethod = HttpMethod.Post.ToString(),
     Url = new Faker().Internet.Url()
   };
   Console.ForegroundColor = ConsoleColor.Green;
-  var requestId = await loggingClient.CreateRequestLogAsync(requestLog);
+  var response = await loggingClient.CreateRequestLogAsync(requestLog);
+  var requestId = response.Response?.Id;
 
   Console.WriteLine($"Created Request Log with ID: {requestId}");
 }
 
 static async Task GetRequestLog(LoggingApiClient loggingClient)
 {
-  Console.Write("Enter Request Log ID: ");
+  Console.WriteLine("Enter Request Log ID: ");
   if (Ulid.TryParse(Console.ReadLine(), out var requestId))
   {
     Console.ForegroundColor = ConsoleColor.Green;
     var retrievedRequestLog = await loggingClient.GetRequestLogAsync(requestId);
     Console.WriteLine($"Request:");
-    Console.WriteLine(JsonConvert.SerializeObject(retrievedRequestLog, Formatting.Indented));
+    Console.WriteLine(JsonConvert.SerializeObject(retrievedRequestLog.Response, Formatting.Indented));
   }
   else
   {
@@ -96,8 +97,6 @@ static async Task GetRequestLog(LoggingApiClient loggingClient)
 
 static async Task CreateResponseLog(LoggingApiClient loggingClient)
 {
-  Console.Write("Enter Request ID to link response: ");
-
   var responseLog = new ResponseLog()
   {
     CorrelationId = Guid.NewGuid().ToString(),
@@ -106,21 +105,22 @@ static async Task CreateResponseLog(LoggingApiClient loggingClient)
     RequestId = Guid.NewGuid(),
     StatusCode = 200
   };
-  var responseId = await loggingClient.CreateResponseLogAsync(responseLog);
+  var response = await loggingClient.CreateResponseLogAsync(responseLog);
+  var requestId = response.Response?.Id;
   Console.ForegroundColor = ConsoleColor.Green;
-  Console.WriteLine($"Created Response Log with ID: {responseId}");
+  Console.WriteLine($"Created Response Log with ID: {requestId}");
 
 }
 
 static async Task GetResponseLog(LoggingApiClient loggingClient)
 {
-  Console.Write("Enter Response Log ID: ");
+  Console.WriteLine("Enter Response Log ID: ");
   if (Ulid.TryParse(Console.ReadLine(), out var responseId))
   {
     var retrievedResponseLog = await loggingClient.GetResponseLogAsync(responseId);
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine($"Response:");
-    Console.WriteLine(JsonConvert.SerializeObject(retrievedResponseLog, Formatting.Indented));
+    Console.WriteLine(JsonConvert.SerializeObject(retrievedResponseLog.Response, Formatting.Indented));
   }
   else
   {
