@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MeraStore.Services.Logging.Domain.Models;
+namespace MeraStore.Services.Logging.SDK.Models;
 
-public abstract class ApiLogEntry
+public abstract class BaseDto
 {
   [Key]
   [DatabaseGenerated(DatabaseGeneratedOption.None)] // We generate ULID ourselves
