@@ -12,10 +12,15 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
 COPY ["src/MeraStore.Services.Logging.Api/MeraStore.Services.Logging.Api.csproj", "src/MeraStore.Services.Logging.Api/"]
 COPY ["src/MeraStore.Services.Logging.Application/MeraStore.Services.Logging.Application.csproj", "src/MeraStore.Services.Logging.Application/"]
 COPY ["src/MeraStore.Services.Logging.Domain/MeraStore.Services.Logging.Domain.csproj", "src/MeraStore.Services.Logging.Domain/"]
 COPY ["src/MeraStore.Services.Logging.Infrastructure/MeraStore.Services.Logging.Infrastructure.csproj", "src/MeraStore.Services.Logging.Infrastructure/"]
+
+ARG NUGET_PASSWORD
+RUN dotnet nuget add source "https://pkgs.dev.azure.com/merastore/MeraStore/_packaging/mera-store-feed/nuget/v3/index.json" --name "mera-store" --username "sanjyotagureddy" --password $NUGET_PASSWORD --store-password-in-clear-text
+
 RUN dotnet restore "./src/MeraStore.Services.Logging.Api/MeraStore.Services.Logging.Api.csproj"
 COPY . .
 WORKDIR "/src/src/MeraStore.Services.Logging.Api"
