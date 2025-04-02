@@ -78,8 +78,8 @@
 
       // HTTP Response Details
       "status-code": { "type": "integer" },
-      "response": { "type": "text" },
-      "request": { "type": "text" },
+      "response": { "type": "keyword" },
+      "request": { "type": "keyword" },
       "response-size-bytes": { "type": "long" },
       "time-taken-ms": { "type": "double" },
       "response-timestamp": { "type": "date" },
