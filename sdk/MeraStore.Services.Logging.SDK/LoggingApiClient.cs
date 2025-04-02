@@ -20,14 +20,13 @@ public class LoggingApiClient(HttpClient httpClient) : ILoggingApiClient
   public async Task<ApiResponse<ResponseLog>> GetResponseLogAsync(Ulid id)
       => await GetLogAsync<ResponseLog>(ApiEndpoints.ResponseLogs.Get, id);
 
-  public async Task<ApiResponse<LogFields>> GetLoggingFieldsAsync()
-      => await GetLogAsync<LogFields>(ApiEndpoints.FieldLogs.GetAll);
+  public async Task<ApiResponse<LoggingFields>> GetLoggingFieldsAsync()
+      => await GetLogAsync<LoggingFields>(ApiEndpoints.FieldLogs.GetAll);
 
-  private async Task<ApiResponse<T>> PostLogAsync<T>(string endpoint, T command) where T: BaseDto
+  private async Task<ApiResponse<T>> PostLogAsync<T>(string endpoint, T command) where T : BaseDto
   {
     var response = await httpClient.PostAsJsonAsync(endpoint, command);
-   return await response.GetResponseOrFault<T>();
-   
+    return await response.GetResponseOrFault<T>();
   }
 
   private async Task<ApiResponse<T>> GetLogAsync<T>(string endpoint, Ulid? id = null)

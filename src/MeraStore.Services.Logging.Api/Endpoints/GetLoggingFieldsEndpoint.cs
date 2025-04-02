@@ -1,15 +1,13 @@
 ﻿using FastEndpoints;
-using MeraStore.Services.Logging.Domain.Attributes;
 using MeraStore.Services.Logging.Domain.Interfaces;
 using MeraStore.Services.Logging.Domain.Models;
-using MeraStore.Shared.Kernel.Common.Exceptions.Exceptions;
 
 namespace MeraStore.Services.Logging.Api.Endpoints;
 
 /// <summary>
 /// Endpoint to retrieve the predefined logging fields schema allowed in Kibana logs.
 /// </summary>
-public class GetLoggingFieldsEndpoint(ILogFieldsProvider logService) : EndpointWithoutRequest<LogFields>
+public class GetLoggingFieldsEndpoint(ILogFieldsProvider logService) : EndpointWithoutRequest<LoggingFields>
 {
   /// <inheritdoc />
   public override void Configure()
@@ -22,7 +20,7 @@ public class GetLoggingFieldsEndpoint(ILogFieldsProvider logService) : EndpointW
       b.WithName("GetLoggingFields")
         .WithSummary("Retrieves the logging fields schema")
         .WithDescription("Returns the predefined logging fields that are allowed in Kibana logs.")
-        .Produces<LogFields>(200, "application/json")
+        .Produces<LoggingFields>(200, "application/json")
         .Produces(500);
     });
   }
