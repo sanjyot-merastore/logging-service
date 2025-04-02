@@ -18,17 +18,17 @@ public class LoggingApiClient(HttpClient httpClient) : ILoggingApiClient
     => await GetLogAsync<RequestLog>(ApiEndpoints.RequestLogs.Get, id, headers ?? []);
 
   public async Task<ApiResponse<ResponseLog>> CreateResponseLogAsync(ResponseLog command,
-    IList<KeyValuePair<string, string>> headers)
+    IList<KeyValuePair<string, string>> headers = null)
     => await PostLogAsync(ApiEndpoints.ResponseLogs.Create, command, headers);
 
-  public async Task<ApiResponse<ResponseLog>> GetResponseLogAsync(Ulid id, IList<KeyValuePair<string, string>> headers)
+  public async Task<ApiResponse<ResponseLog>> GetResponseLogAsync(Ulid id, IList<KeyValuePair<string, string>> headers = null)
     => await GetLogAsync<ResponseLog>(ApiEndpoints.ResponseLogs.Get, id, headers ?? []);
 
-  public async Task<ApiResponse<LoggingFields>> GetLoggingFieldsAsync(IList<KeyValuePair<string, string>> headers)
+  public async Task<ApiResponse<LoggingFields>> GetLoggingFieldsAsync(IList<KeyValuePair<string, string>> headers = null)
     => await GetLogAsync<LoggingFields>(ApiEndpoints.FieldLogs.GetAll, headers: headers ?? []);
 
   private async Task<ApiResponse<T>> PostLogAsync<T>(string endpoint, T command,
-    IList<KeyValuePair<string, string>> headers) where T : BaseDto
+    IList<KeyValuePair<string, string>> headers = null) where T : BaseDto
   {
     AddHeaders(headers);
     var response = await httpClient.PostAsJsonAsync(endpoint, command);
