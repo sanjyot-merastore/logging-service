@@ -4,5 +4,5 @@ namespace MeraStore.Services.Logging.Domain.Interfaces;
 
 public interface ILogFieldsProvider
 {
-  Task<LogFields> GetFieldsAsync();
+  Task<LoggingFields> GetFieldsAsync();
 }

@@ -5,7 +5,7 @@ public interface ILoggingApiClient
 {
   Task<ApiResponse<RequestLog>> CreateRequestLogAsync(RequestLog command);
   Task<ApiResponse<ResponseLog>> CreateResponseLogAsync(ResponseLog command);
-  Task<ApiResponse<LogFields>> GetLoggingFieldsAsync();
+  Task<ApiResponse<LoggingFields>> GetLoggingFieldsAsync();
   Task<ApiResponse<RequestLog>> GetRequestLogAsync(Ulid id);
   Task<ApiResponse<ResponseLog>> GetResponseLogAsync(Ulid id);
 }

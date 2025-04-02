@@ -132,7 +132,7 @@ static async Task GetLoggingFields(LoggingApiClient loggingClient)
 {
   var logFields = await loggingClient.GetLoggingFieldsAsync();
   Console.ForegroundColor = ConsoleColor.Green;
-  Console.WriteLine("Logging Fields: " + string.Join(", ", logFields.Response?.Fields ?? []));
+  Console.WriteLine("Logging Fields: " + string.Join(", ", JsonConvert.SerializeObject(logFields.Response)));
 }
 
 static async Task ExecuteWithColor(Func<Task> action)
