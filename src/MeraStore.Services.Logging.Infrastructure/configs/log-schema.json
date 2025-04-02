@@ -78,8 +78,8 @@
 
       // HTTP Response Details
       "status-code": { "type": "integer" },
-      "response": { "type": "text" },
-      "request": { "type": "text" },
+      "response": { "type": "keyword" },
+      "request": { "type": "keyword" },
       "response-size-bytes": { "type": "long" },
       "time-taken-ms": { "type": "double" },
       "response-timestamp": { "type": "date" },
@@ -222,108 +222,108 @@
       "analytics-event": { "type": "keyword" },
       "analytics-timestamp": { "type": "date" },
       "analytics-value": {
-        "type": "double",
+        "type": "double"
+      },
 
 
-        // Logging Service
-        "log-id": { "type": "keyword" },
-        "log-level": { "type": "keyword" },
-        "log-source": { "type": "keyword" },
-        "log-correlation-id": { "type": "keyword" },
-        "log-retention": { "type": "integer" },
-        "log-category": { "type": "keyword" },
+      // Logging Service
+      "log-id": { "type": "keyword" },
+      "log-level": { "type": "keyword" },
+      "log-source": { "type": "keyword" },
+      "log-correlation-id": { "type": "keyword" },
+      "log-retention": { "type": "integer" },
+      "log-category": { "type": "keyword" },
 
-        // Review Service
-        "review-id": { "type": "keyword" },
-        "review-rating": { "type": "double" },
-        "review-comments": { "type": "text" },
-        "review-moderation-status": { "type": "keyword" },
-        "review-user-id": { "type": "keyword" },
-        "review-product-id": { "type": "keyword" },
+      // Review Service
+      "review-id": { "type": "keyword" },
+      "review-rating": { "type": "double" },
+      "review-comments": { "type": "text" },
+      "review-moderation-status": { "type": "keyword" },
+      "review-user-id": { "type": "keyword" },
+      "review-product-id": { "type": "keyword" },
 
-        // Analytics Service
-        "analytics-event-id": { "type": "keyword" },
-        "analytics-event-type": { "type": "keyword" },
-        "analytics-event-properties": { "type": "text" },
-        "analytics-metric-name": { "type": "keyword" },
-        "analytics-metric-value": { "type": "double" },
-        "analytics-aggregation-type": { "type": "keyword" },
-        "analytics-user-id": { "type": "keyword" },
+      // Analytics Service
+      "analytics-event-id": { "type": "keyword" },
+      "analytics-event-type": { "type": "keyword" },
+      "analytics-event-properties": { "type": "text" },
+      "analytics-metric-name": { "type": "keyword" },
+      "analytics-metric-value": { "type": "double" },
+      "analytics-aggregation-type": { "type": "keyword" },
+      "analytics-user-id": { "type": "keyword" },
 
-        // Fraud Detection Service
-        "fraud-detection-id": { "type": "keyword" },
-        "fraud-risk-score": { "type": "double" },
-        "fraud-alert-flag": { "type": "boolean" },
-        "fraud-reason": { "type": "text" },
-        "transaction-anomaly-details": { "type": "text" },
-        "fraud-user-id": { "type": "keyword" },
-        "fraud-payment-id": { "type": "keyword" },
+      // Fraud Detection Service
+      "fraud-detection-id": { "type": "keyword" },
+      "fraud-risk-score": { "type": "double" },
+      "fraud-alert-flag": { "type": "boolean" },
+      "fraud-reason": { "type": "text" },
+      "transaction-anomaly-details": { "type": "text" },
+      "fraud-user-id": { "type": "keyword" },
+      "fraud-payment-id": { "type": "keyword" },
 
-        // Notification Service
-        "notification-delivery-status": { "type": "keyword" },
-        "notification-recipient-id": { "type": "keyword" },
-        "notification-template": { "type": "text" },
-        "notification-timestamp": { "type": "date" },
+      // Notification Service
+      "notification-delivery-status": { "type": "keyword" },
+      "notification-recipient-id": { "type": "keyword" },
+      "notification-template": { "type": "text" },
+      "notification-timestamp": { "type": "date" },
 
-        // Payment Service
-        "payment-gateway-id": { "type": "keyword" },
-        "transaction-reference": { "type": "keyword" },
-        "chargeback-status": { "type": "keyword" },
-        "settlement-time": { "type": "date" },
-        "payment-user-id": { "type": "keyword" },
-        "payment-order-id": { "type": "keyword" },
+      // Payment Service
+      "payment-gateway-id": { "type": "keyword" },
+      "transaction-reference": { "type": "keyword" },
+      "chargeback-status": { "type": "keyword" },
+      "settlement-time": { "type": "date" },
+      "payment-user-id": { "type": "keyword" },
+      "payment-order-id": { "type": "keyword" },
 
-        // Inventory Service
+      // Inventory Service
 
-        "stock-allocation-status": { "type": "keyword" },
+      "stock-allocation-status": { "type": "keyword" },
 
-        "warehouse-location": { "type": "keyword" },
-        "safety-stock-level": { "type": "integer" },
-        "backorder-status": { "type": "keyword" },
-        "stock-item-id": { "type": "keyword" },
+      "warehouse-location": { "type": "keyword" },
+      "safety-stock-level": { "type": "integer" },
+      "backorder-status": { "type": "keyword" },
+      "stock-item-id": { "type": "keyword" },
 
-        // Discount Service
-        "discount-id": { "type": "keyword" },
-        "discount-type": { "type": "keyword" },
-        "discount-eligibility": { "type": "keyword" },
-        "discount-usage-count": { "type": "integer" },
-        "discount-tier": { "type": "keyword" },
-        "discount-product-id": { "type": "keyword" },
+      // Discount Service
+      "discount-id": { "type": "keyword" },
+      "discount-type": { "type": "keyword" },
+      "discount-eligibility": { "type": "keyword" },
+      "discount-usage-count": { "type": "integer" },
+      "discount-tier": { "type": "keyword" },
+      "discount-product-id": { "type": "keyword" },
 
-        // Cart Service
+      // Cart Service
 
-        "cart-expiration-time": { "type": "date" },
-        "cart-item-count": { "type": "integer" },
+      "cart-expiration-time": { "type": "date" },
+      "cart-item-count": { "type": "integer" },
 
-        "applied-coupons": { "type": "text" },
-        "cart-user-id": { "type": "keyword" },
+      "applied-coupons": { "type": "text" },
+      "cart-user-id": { "type": "keyword" },
 
-        // Order Service
+      // Order Service
 
-        "order-fulfillment-status": { "type": "keyword" },
-        "shipping-provider": { "type": "keyword" },
-        "estimated-delivery-date": { "type": "date" },
-        "order-tracking-id": { "type": "keyword" },
-        "order-user-id": { "type": "keyword" },
-        "order-payment-id": { "type": "keyword" },
+      "order-fulfillment-status": { "type": "keyword" },
+      "shipping-provider": { "type": "keyword" },
+      "estimated-delivery-date": { "type": "date" },
+      "order-tracking-id": { "type": "keyword" },
+      "order-user-id": { "type": "keyword" },
+      "order-payment-id": { "type": "keyword" },
 
-        // Product Service
+      // Product Service
 
-        "product-variant-id": { "type": "keyword" },
-        "product-specifications": { "type": "text" },
-        "product-warranty": { "type": "text" },
-        "product-tags": { "type": "text" },
+      "product-variant-id": { "type": "keyword" },
+      "product-specifications": { "type": "text" },
+      "product-warranty": { "type": "text" },
+      "product-tags": { "type": "text" },
 
-        // User Service
+      // User Service
 
-        "user-preferences": { "type": "text" },
-        "subscription-tier": { "type": "keyword" },
-        "last-login-timestamp": { "type": "date" },
-        "user-verification-status": { "type": "keyword" },
-        "user-session-id": { "type": "keyword" },
-        "user-device-id": {
-          "type": "keyword"
-        }
+      "user-preferences": { "type": "text" },
+      "subscription-tier": { "type": "keyword" },
+      "last-login-timestamp": { "type": "date" },
+      "user-verification-status": { "type": "keyword" },
+      "user-session-id": { "type": "keyword" },
+      "user-device-id": {
+        "type": "keyword"
       }
     }
   }

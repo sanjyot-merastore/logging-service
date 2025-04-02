@@ -73,7 +73,7 @@ static async Task CreateRequestLog(LoggingApiClient loggingClient)
     Url = new Faker().Internet.Url()
   };
   Console.ForegroundColor = ConsoleColor.Green;
-  var response = await loggingClient.CreateRequestLogAsync(requestLog);
+  var response = await loggingClient.CreateRequestLogAsync(requestLog, GetDefaultHeaders());
   var requestId = response.Response?.Id;
 
   Console.WriteLine($"Created Request Log with ID: {requestId}");
@@ -85,7 +85,7 @@ static async Task GetRequestLog(LoggingApiClient loggingClient)
   if (Ulid.TryParse(Console.ReadLine(), out var requestId))
   {
     Console.ForegroundColor = ConsoleColor.Green;
-    var retrievedRequestLog = await loggingClient.GetRequestLogAsync(requestId);
+    var retrievedRequestLog = await loggingClient.GetRequestLogAsync(requestId, GetDefaultHeaders());
     Console.WriteLine($"Request:");
     Console.WriteLine(JsonConvert.SerializeObject(retrievedRequestLog.Response, Formatting.Indented));
   }
@@ -105,7 +105,7 @@ static async Task CreateResponseLog(LoggingApiClient loggingClient)
     RequestId = Guid.NewGuid(),
     StatusCode = 200
   };
-  var response = await loggingClient.CreateResponseLogAsync(responseLog);
+  var response = await loggingClient.CreateResponseLogAsync(responseLog, GetDefaultHeaders());
   var requestId = response.Response?.Id;
   Console.ForegroundColor = ConsoleColor.Green;
   Console.WriteLine($"Created Response Log with ID: {requestId}");
@@ -117,7 +117,7 @@ static async Task GetResponseLog(LoggingApiClient loggingClient)
   Console.WriteLine("Enter Response Log ID: ");
   if (Ulid.TryParse(Console.ReadLine(), out var responseId))
   {
-    var retrievedResponseLog = await loggingClient.GetResponseLogAsync(responseId);
+    var retrievedResponseLog = await loggingClient.GetResponseLogAsync(responseId, GetDefaultHeaders());
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine($"Response:");
     Console.WriteLine(JsonConvert.SerializeObject(retrievedResponseLog.Response, Formatting.Indented));
@@ -130,7 +130,7 @@ static async Task GetResponseLog(LoggingApiClient loggingClient)
 
 static async Task GetLoggingFields(LoggingApiClient loggingClient)
 {
-  var logFields = await loggingClient.GetLoggingFieldsAsync();
+  var logFields = await loggingClient.GetLoggingFieldsAsync(GetDefaultHeaders());
   Console.ForegroundColor = ConsoleColor.Green;
   Console.WriteLine("Logging Fields: " + string.Join(", ", JsonConvert.SerializeObject(logFields.Response)));
 }
@@ -151,4 +151,12 @@ static async Task ExecuteWithColor(Func<Task> action)
   {
     Console.ResetColor();
   }
+}
+
+static IList<KeyValuePair<string, string>> GetDefaultHeaders()
+{
+  return new List<KeyValuePair<string, string>>()
+  {
+    new KeyValuePair<string, string>("ms-correlationId", Guid.NewGuid().ToString())
+  };
 }
