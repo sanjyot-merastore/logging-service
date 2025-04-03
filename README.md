@@ -21,6 +21,7 @@ The **Logging Service** is a centralized logging solution for MeraStore applicat
 Clone the repository:
 ```sh
 git clone https://github.com/MeraStore/logging-service.git
+
 cd logging-service
 ```
 
