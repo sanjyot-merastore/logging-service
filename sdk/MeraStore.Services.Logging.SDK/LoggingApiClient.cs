@@ -2,6 +2,7 @@
 
 using MeraStore.Services.Logging.SDK.Interfaces;
 using MeraStore.Services.Logging.SDK.Models;
+using MeraStore.Shared.Kernel.Common.Core;
 
 namespace MeraStore.Services.Logging.SDK;
 
@@ -16,6 +17,13 @@ public class LoggingApiClient(HttpClient httpClient) : ILoggingApiClient
   public async Task<ApiResponse<RequestLog>> GetRequestLogAsync(Ulid id,
     IList<KeyValuePair<string, string>> headers = null)
     => await GetLogAsync<RequestLog>(ApiEndpoints.RequestLogs.Get, id, headers ?? []);
+
+  public async Task<ApiResponse<string>> GetRequestPayloadAsync(Ulid id, IList<KeyValuePair<string, string>> headers = null)
+    => await GetLogAsync<string>(ApiEndpoints.RequestLogs.GetPayload, id, headers ?? []);
+
+
+  public async Task<ApiResponse<string>> GetResponsePayloadAsync(Ulid id, IList<KeyValuePair<string, string>> headers = null)
+    => await GetLogAsync<string>(ApiEndpoints.RequestLogs.GetPayload, id, headers ?? []);
 
   public async Task<ApiResponse<ResponseLog>> CreateResponseLogAsync(ResponseLog command,
     IList<KeyValuePair<string, string>> headers = null)

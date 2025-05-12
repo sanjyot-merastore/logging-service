@@ -13,11 +13,13 @@ public static class ApiEndpoints
   {
     public const string Create = $"{BaseUri}/requests";
     public const string Get = $"{BaseUri}/requests/{{0}}"; // Placeholder for ID
+    public const string GetPayload = $"{BaseUri}/requests/payload/{{0}}"; // Placeholder for ID
   }
 
   public static class ResponseLogs
   {
     public const string Create = $"{BaseUri}/responses";
     public const string Get = $"{BaseUri}/responses/{{0}}"; // Placeholder for ID
+    public const string GetPayload = $"{BaseUri}/responses/payload/{{0}}"; // Placeholder for ID
   }
 }
