@@ -10,17 +10,24 @@ public class CreateApiRequestLogHandler(IApiLogRepository logRepo) : ICommandHan
 
   public async Task<ApiRequestLog> ExecuteAsync(CreateApiRequestLogCommand cmd, CancellationToken ct)
   {
-    var logEntry = new ApiRequestLog
+    var logEntry = new ApiRequestLog();
+    try
     {
-      HttpMethod = cmd.HttpMethod,
-      Url = cmd.Url,
-      Payload = cmd.Payload,
-      ContentType = cmd.ContentType,
-      CorrelationId = cmd.CorrelationId,
-      Timestamp = DateTime.UtcNow
-    };
+      
+      logEntry.HttpMethod = cmd.HttpMethod;
+      logEntry.Url = cmd.Url;
+      logEntry.Payload = cmd.Payload;
+      logEntry.ContentType = cmd.ContentType;
+      logEntry.CorrelationId = cmd.CorrelationId;
+      logEntry.Timestamp = DateTime.UtcNow;
 
-    await logRepo.AddRequestLogAsync(logEntry, ct);
+      await logRepo.AddRequestLogAsync(logEntry, ct);
+    }
+    catch (Exception e)
+    {
+      Console.WriteLine(e);
+      throw;
+    }
     return logEntry;
   }
 }

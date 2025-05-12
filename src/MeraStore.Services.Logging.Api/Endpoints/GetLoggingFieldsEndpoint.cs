@@ -7,7 +7,7 @@ namespace MeraStore.Services.Logging.Api.Endpoints;
 /// <summary>
 /// Endpoint to retrieve the predefined logging fields schema allowed in Kibana logs.
 /// </summary>
-public class GetLoggingFieldsEndpoint(ILogFieldsProvider logService) : EndpointWithoutRequest<LoggingFields>
+public class GetLoggingFieldsEndpoint(ILogFieldsProvider logService, ILogger<GetLoggingFieldsEndpoint> logger) : EndpointWithoutRequest<LoggingFields>
 {
   /// <inheritdoc />
   public override void Configure()
@@ -32,6 +32,7 @@ public class GetLoggingFieldsEndpoint(ILogFieldsProvider logService) : EndpointW
   /// <returns>A list of allowed logging fields.</returns>
   public override async Task HandleAsync(CancellationToken ct)
   {
+    logger.LogInformation("Hello from log.");
     var fields = await logService.GetFieldsAsync();
     await SendAsync(fields, cancellation: ct);
   }
