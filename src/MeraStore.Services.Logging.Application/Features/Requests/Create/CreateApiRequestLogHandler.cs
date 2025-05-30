@@ -2,6 +2,7 @@
 
 using MeraStore.Services.Logging.Domain.Models;
 using MeraStore.Services.Logging.Domain.Repositories;
+using MeraStore.Shared.Kernel.Exceptions;
 
 namespace MeraStore.Services.Logging.Application.Features.Requests.Create;
 
@@ -25,8 +26,7 @@ public class CreateApiRequestLogHandler(IApiLogRepository logRepo) : ICommandHan
     }
     catch (Exception e)
     {
-      Console.WriteLine(e);
-      throw;
+        throw LoggingServiceException.LogDeserializationError(e.Message, e.InnerException);
     }
     return logEntry;
   }
