@@ -1,109 +1,112 @@
 ﻿using MeraStore.Services.Logging.Domain.Attributes;
-using MeraStore.Shared.Kernel.Common.Exceptions.ErrorsCodes;
-using MeraStore.Shared.Kernel.Common.Exceptions.Exceptions;
+using MeraStore.Shared.Kernel.Exceptions;
+using MeraStore.Shared.Kernel.Exceptions.Core;
+using MeraStore.Shared.Kernel.Exceptions.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MeraStore.Services.Logging.Api.Middlewares
+namespace MeraStore.Services.Logging.Api.Middlewares;
+
+/// <summary>
+/// Global error-handling middleware to catch, transform, and log exceptions into structured problem details.
+/// </summary>
+public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
 {
-  /// <summary>
-  /// 
-  /// </summary>
-  /// <param name="next"></param>
-  /// <param name="logger"></param>
-  public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
-  {
     private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
     {
-      NullValueHandling = NullValueHandling.Ignore // Ignore null values
+        NullValueHandling = NullValueHandling.Ignore
     };
 
     public async Task InvokeAsync(HttpContext context)
     {
-      try
-      {
-        await next(context);
-      }
-      catch (FluentValidation.ValidationException ex)
-      {
-        await HandleValidationExceptionAsync(context, ex);
-      }
-      catch (BaseAppException ex)
-      {
-        await HandleExceptionAsync(context, ex);
-      }
-      catch (Exception ex)
-      {
-        var wrappedException = new BaseAppException(ServiceProvider.GetServiceCode(Constants.ServiceIdentifiers.General), GetRequestEventCode(context),
-          ErrorCodeProvider.GetErrorCode(Constants.ErrorCodes.InternalServerError),
-          HttpStatusCode.InternalServerError, ex);
+        try
+        {
+            await next(context);
+        }
+        catch (FluentValidation.ValidationException ex)
+        {
+            await HandleValidationExceptionAsync(context, ex);
+        }
+        catch (BaseAppException ex)
+        {
+            await HandleStructuredExceptionAsync(context, ex);
+        }
+        catch (Exception ex)
+        {
+            var wrapped = new CommonException(
+                EventCodeRegistry.GetCode(Shared.Kernel.Exceptions.Constants.EventCodes.InternalServerError),
+                ErrorCodeRegistry.GetCode(Shared.Kernel.Exceptions.Constants.ErrorCodes.InternalServerError),
+                HttpStatusCode.InternalServerError,
+                "An unexpected server error occurred.",
+                innerException: ex?.InnerException,
+                category: ExceptionCategory.Operational,
+                severity: ExceptionSeverity.Critical
+            );
 
-        // Handle unexpected exceptions with logging
-        await HandleExceptionAsync(context, wrappedException);
-      }
+            await HandleStructuredExceptionAsync(context, wrapped);
+        }
     }
 
     private async Task HandleValidationExceptionAsync(HttpContext context, FluentValidation.ValidationException exception)
     {
-      // Log the validation exception details immediately
-      logger.LogError(exception, "Validation error occurred with details: {@ValidationErrors}",
-          exception.Errors.GroupBy(x => x.PropertyName)
-                  .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()));
+        logger.LogError(exception, "Validation error occurred: {@ValidationErrors}",
+            exception.Errors
+                .GroupBy(x => x.PropertyName)
+                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()));
 
-      context.Response.ContentType = "application/problem+json";
-      context.Response.StatusCode = 400; // Bad Request for validation errors
+        context.Response.ContentType = "application/problem+json";
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-      var validationErrors = exception.Errors
-          .GroupBy(x => x.PropertyName)
-          .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+        var validationErrors = exception.Errors
+            .GroupBy(x => x.PropertyName)
+            .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
 
-      var problemDetails = new ValidationProblemDetails(validationErrors)
-      {
-        Type = GetRequestEventCode(context),
-        Status = context.Response.StatusCode,
-        Title = "One or more validation errors occurred.",
-        Instance = context.TraceIdentifier
-      };
-      await context.Response.WriteAsync(JsonConvert.SerializeObject(problemDetails, _jsonSerializerSettings));
+        var problemDetails = new ValidationProblemDetails(validationErrors)
+        {
+            Type = GetRequestEventCode(context),
+            Status = context.Response.StatusCode,
+            Title = "Validation failed.",
+            Instance = context.TraceIdentifier
+        };
+
+        await context.Response.WriteAsync(JsonConvert.SerializeObject(problemDetails, _jsonSerializerSettings));
     }
 
-    private Task HandleExceptionAsync(HttpContext context, BaseAppException exception)
+    private Task HandleStructuredExceptionAsync(HttpContext context, BaseAppException exception)
     {
-      context.Response.ContentType = "application/problem+json";
-      context.Response.StatusCode = (int)exception.StatusCode;
+        context.Response.ContentType = "application/problem+json";
+        context.Response.StatusCode = (int)exception.StatusCode;
 
-      var problemDetails = new ProblemDetails()
-      {
-        Status = context.Response.StatusCode,
-        Type = GetRequestEventCode(context),
-        Title = "An error occurred while processing your request.",
-        Detail = exception.Message,
-      };
+        var problemDetails = new ProblemDetails
+        {
+            Status = context.Response.StatusCode,
+            Type = exception.EventCode ?? GetRequestEventCode(context),
+            Title =  "An error occurred while processing your request.",
+            Detail = exception.Message,
+            Instance = context.TraceIdentifier
+        };
 
-      // Add only relevant extensions without exposing headers
-      problemDetails.Extensions["errorCode"] = exception.FullErrorCode;
-      problemDetails.Extensions["service"] = ServiceProvider.GetServiceKey(exception.ServiceIdentifier);
-      problemDetails.Extensions["traceId"] = context.TraceIdentifier;
+        // Structured extensions for richer diagnostics
+        problemDetails.Extensions["errorCode"] = exception.FullErrorCode;
+        problemDetails.Extensions["category"] = exception.Category.ToString();
+        problemDetails.Extensions["severity"] = exception.Severity.ToString();
+        problemDetails.Extensions["service"] = ServiceCodeRegistry.GetKey(exception.ServiceIdentifier);
+        problemDetails.Extensions["traceId"] = context.TraceIdentifier;
 
-      // Log the error
-      logger.LogError(exception, "An error occurred: {Message}", exception.Message);
+        logger.LogError(exception, "Structured error occurred: {Message} | Code: {Code} | Category: {Category}",
+            exception.Message, exception.FullErrorCode, exception.Category);
 
-      return context.Response.WriteAsync(JsonConvert.SerializeObject(problemDetails, _jsonSerializerSettings));
+        return context.Response.WriteAsync(JsonConvert.SerializeObject(problemDetails, _jsonSerializerSettings));
     }
-
 
     /// <summary>
-    /// This gets the request event code associated with any endpoint of any service
-    /// for quicker dereferencing and diagnosis.
-    /// All endpoints to be created are to be decorated with `EventCodeAttribute`
-    /// with a unique value.
+    /// Resolves the event code attached to the endpoint, if any.
     /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
     private string GetRequestEventCode(HttpContext context)
     {
-      var endpoint = context.GetEndpoint();
-      var code = endpoint?.Metadata.GetMetadata<EventCodeAttribute>()?.EventCode;
-      return string.IsNullOrEmpty(code) ? Constants.EventCodes.InternalServerError : code;
+        var endpoint = context.GetEndpoint();
+        var code = endpoint?.Metadata.GetMetadata<EventCodeAttribute>()?.EventCode;
+        return string.IsNullOrWhiteSpace(code)
+            ? Shared.Kernel.Exceptions.Constants.EventCodes.InternalServerError
+            : code;
     }
-  }
 }
