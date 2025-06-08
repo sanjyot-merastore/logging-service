@@ -157,6 +157,23 @@
       "command-payload": { "type": "text" },
       "event-payload": { "type": "text" },
       "event-timestamp": { "type": "date" },
+      // 💡 Advanced observability
+      "event-version": { "type": "keyword" },
+      "event-retry-count": { "type": "integer" },
+      "event-handler-name": { "type": "keyword" },
+      "event-consumer-group": { "type": "keyword" },
+      "event-offset": { "type": "long" },
+      "event-partition": { "type": "integer" },
+      "event-topic": { "type": "keyword" },
+      "event-ingest-timestamp": { "type": "date" },
+      "event-publish-timestamp": { "type": "date" },
+
+      // 🧠 Optional metadata for versioning, categorization
+      "event-category": { "type": "keyword" },
+      "event-priority": { "type": "keyword" },
+      "event-stream-id": { "type": "keyword" },
+      "is-replay": { "type": "boolean" },
+      "is-compensating-action": { "type": "boolean" },
 
       // User & Session Data
       "user-id": { "type": "keyword" },
@@ -208,6 +225,20 @@
       "auth-token": { "type": "keyword" },
       "auth-role": { "type": "keyword" },
       "auth-permissions": { "type": "text" },
+      "auth-client-id": { "type": "keyword" }, // OAuth2 or app ID
+      "auth-session-id": { "type": "keyword" }, // Track per-login session
+      "auth-method": { "type": "keyword" }, // e.g., password, OTP, SSO, biometric
+      "auth-scope": { "type": "keyword" }, // OAuth2 scopes
+      "auth-issuer": { "type": "keyword" }, // JWT issuer
+      "auth-expiry": { "type": "date" }, // Token expiry time
+      "auth-issued-at": { "type": "date" }, // Token iat
+      "auth-is-refresh": { "type": "boolean" }, // Is this a refresh token
+      "auth-token-type": { "type": "keyword" }, // Bearer, JWT, etc.
+      "auth-audience": { "type": "keyword" }, // Token audience (aud claim)
+      "auth-tenant-id": { "type": "keyword" }, // For multi-tenant segregation
+      "auth-device-id": { "type": "keyword" }, // For tracking auth from specific device
+      "auth-region": { "type": "keyword" }, // Region the user authenticated from
+
 
       // Notifications
       "notification-id": { "type": "keyword" },
@@ -319,12 +350,54 @@
 
       "user-preferences": { "type": "text" },
       "subscription-tier": { "type": "keyword" },
+      "status": { "type": "keyword" },
       "last-login-timestamp": { "type": "date" },
       "user-verification-status": { "type": "keyword" },
       "user-session-id": { "type": "keyword" },
       "user-device-id": {
         "type": "keyword"
-      }
+      },
+      "event-processing-time-ms": { "type": "long" },
+      "workflow-id": { "type": "keyword" },
+      "workflow-name": { "type": "keyword" },
+      "workflow-step-name": { "type": "keyword" },
+      "workflow-step-sequence": { "type": "integer" },
+      "workflow-status": { "type": "keyword" },
+      "workflow-start-timestamp": { "type": "date" },
+      "workflow-end-timestamp": { "type": "date" },
+      "workflow-duration-ms": { "type": "long" },
+      "workflow-error-message": { "type": "text" },
+      "workflow-error-stack": { "type": "text" },
+      "workflow-retry-count": { "type": "integer" },
+      "workflow-trigger-source": { "type": "keyword" },
+      "workflow-input-payload": { "type": "text" },
+      "workflow-output-payload": { "type": "text" },
+      "pipeline-name": { "type": "keyword" },
+      "pipeline-duration-ms": { "type": "long" },
+      "pipeline-failure-step-name": { "type": "keyword" },
+      "pipeline-recovery-action": { "type": "keyword" },
+      "pipeline-behavior-duration": { "type": "long" },
+
+      "request-referer": { "type": "keyword" },
+      "request-caller": { "type": "keyword" },
+      "request-client-timestamp": { "type": "date" },
+      "request-content-encoding": { "type": "keyword" },
+      "request-accept-language": { "type": "keyword" },
+      "request-correlation-id": { "type": "keyword" },
+      "request-cookie": { "type": "text" },
+      "request-protocol-version": { "type": "keyword" },
+      "request-endpoint-category": { "type": "keyword" },
+
+      "response-status-message": { "type": "keyword" },
+      "response-content-encoding": { "type": "keyword" },
+      "response-cache-status": { "type": "keyword" },
+      "response-time-to-first-byte-ms": { "type": "long" },
+      "response-trailer-headers": { "type": "text" },
+      "response-set-cookie": { "type": "text" },
+      "response-transfer-encoding": { "type": "keyword" },
+
+      "round-trip-time-ms": { "type": "long" },
+      "request-response-size-delta": { "type": "long" }
     }
   }
 }

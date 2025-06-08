@@ -1,6 +1,8 @@
 ﻿using MeraStore.Services.Logging.Domain.Interfaces;
 using MeraStore.Services.Logging.Domain.Models;
+
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 
 namespace MeraStore.Services.Logging.Application.Services;
