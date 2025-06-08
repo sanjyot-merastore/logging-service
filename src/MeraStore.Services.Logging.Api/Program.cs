@@ -1,9 +1,14 @@
-﻿using FastEndpoints;
+﻿using Elastic.Clients.Elasticsearch;
+
+using FastEndpoints;
 using FastEndpoints.Swagger;
+
 using MeraStore.Services.Logging.Api.Extensions;
 using MeraStore.Services.Logging.Api.Middlewares;
 using MeraStore.Services.Logging.Application.Services;
+using MeraStore.Services.Logging.Domain.Interfaces;
 using MeraStore.Services.Logging.Infrastructure;
+
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,33 +26,29 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddProblemDetails();
 builder.Services.AddSwaggerWithXmlDocs();
+builder.Services.AddIndexMangerServices(builder.Configuration);
 builder.AddLoggingServices();
+
 builder.Services.AddApiServices();
 
 var app = builder.Build();
 app.UseFastEndpoints(c =>
 {
-  c.Versioning.Prefix = "v";
-  c.Endpoints.RoutePrefix = "api/v1.0/logs"; // Ensures endpoints are correctly mapped
+    c.Versioning.Prefix = "v";
+    c.Endpoints.RoutePrefix = "api/v1.0/logs"; // Ensures endpoints are correctly mapped
 });
 app.UseSwaggerGen();
 
 // Apply database migrations on startup with logging
 using (var scope = app.Services.CreateScope())
 {
-  var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-  var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    var templateService = scope.ServiceProvider.GetRequiredService<ILogIndexTemplateService>();
 
-  try
-  {
-    logger.LogInformation("Applying database migrations...");
-    dbContext.Database.Migrate();
-    logger.LogInformation("✅ Database migrations applied successfully.");
-  }
-  catch (Exception ex)
-  {
-    logger.LogError(ex, "❌ Error applying database migrations.");
-  }
+    await RunMigrations(logger, dbContext);
+
+    await templateService.SetupTemplatesAsync();
 }
 
 
@@ -57,4 +58,18 @@ app.UseHttpsRedirection();
 app.MapHealthChecks("/health");
 
 app.Run();
+
+async Task RunMigrations(ILogger<Program> logger, AppDbContext appDbContext)
+{
+    try
+    {
+        logger.LogInformation("Applying database migrations...");
+        await appDbContext.Database.MigrateAsync();
+        logger.LogInformation("✅ Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "❌ Error applying database migrations.");
+    }
+}
 
