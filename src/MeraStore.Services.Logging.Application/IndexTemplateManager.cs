@@ -88,12 +88,13 @@ public class IndexTemplateManager(ElasticsearchClient client, Dictionary<string,
         foreach (var pattern in _indexPatterns)
         {
             var matchingIndices = allIndices
-                .Where(index => index.StartsWith(pattern.TrimEnd('*'), StringComparison.OrdinalIgnoreCase))
+                .Where(index => index.StartsWith(pattern.TrimEnd('*'), StringComparison.OrdinalIgnoreCase)
+                                && !index.Contains("re-indexed"))
                 .ToList();
 
             foreach (var sourceIndex in matchingIndices)
             {
-                var tempIndex = $"{sourceIndex}-reindexed-{DateTime.UtcNow:yyyyMMddHHmmss}";
+                var tempIndex = $"{sourceIndex}-re-indexed-{DateTime.UtcNow:yyyyMMddHHmmss}";
 
                 Console.WriteLine($"🔁 Reindexing: {sourceIndex} → {tempIndex}");
 
@@ -112,7 +113,14 @@ public class IndexTemplateManager(ElasticsearchClient client, Dictionary<string,
                 if (!reindexResponse.IsValidResponse)
                     throw new Exception($"Reindexing failed for index '{sourceIndex}': {reindexResponse.ElasticsearchServerError}");
 
-                Console.WriteLine($"✅ Successfully reindexed {sourceIndex} to {tempIndex}");
+                Console.WriteLine($"✅ Successfully re-indexed {sourceIndex} to {tempIndex}");
+
+                // 3. Delete the temp index after copy
+                var deleteResponse = await client.Indices.DeleteAsync(tempIndex);
+                if (!deleteResponse.IsValidResponse)
+                    throw new Exception($"Failed to delete temp index '{tempIndex}': {deleteResponse.ElasticsearchServerError}");
+
+                Console.WriteLine($"🧹 Deleted temp index '{tempIndex}' after reindexing.");
             }
         }
     }

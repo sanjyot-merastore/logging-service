@@ -30,6 +30,9 @@
       "request-size-bytes": { "type": "long" },
       "request-timestamp": { "type": "date" },
       "request-protocol": { "type": "keyword" },
+      "action": { "type": "keyword" },
+      "action-type": { "type": "keyword" },
+      "verb": { "type": "keyword" },
 
       // Request Headers
       "rq-header.ms-correlationId": { "type": "keyword" },

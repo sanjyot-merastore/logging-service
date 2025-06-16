@@ -44,13 +44,9 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    var templateService = scope.ServiceProvider.GetRequiredService<ILogIndexTemplateService>();
 
     await RunMigrations(logger, dbContext);
-
-    await templateService.SetupTemplatesAsync();
 }
-
 
 app.UseMiddleware<TracingMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
